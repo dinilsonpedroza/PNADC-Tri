@@ -1,0 +1,113 @@
+library("PNADcIBGE")
+variaveis_selecionadas <- c("UF", "V2007", "V2009","V2010", "V3009A", "VD3004", "VD4001","VD4002","VD4019","VD4020","VD4030")
+dadosPNADc <- get_pnadc(year = 2019, quarter = 4, vars = variaveis_selecionadas)
+library(survey)
+
+################ Calculando renda total e média do Brasil ####################
+totalrenda <- svytotal(~VD4019, dadosPNADc, na.rm = T)
+totalrenda
+
+mediarenda <- svymean(~VD4019, dadosPNADc, na.rm = T)
+mediarenda
+
+################ Calculando a taxa de desemprego do Brasil ###################
+
+txdesocup <- svyratio(~VD4002 == "Pessoas desocupadas",~VD4001 == "Pessoas na força de trabalho", dadosPNADc, na.rm = T)
+txdesocup
+
+################ Calculando os totais por sexo ################################
+
+totalsexo <- svytotal(~V2007, dadosPNADc, na.rm = T)
+totalsexo
+
+################# Totais por sexo e raça #######################################
+totalsexoraca <- svytotal(~V2007 + V2010,dadosPNADc, na.rm = T)
+totalsexoraca
+
+################### Cruzando sexo e raça ######################################
+
+totalsexoEraca <- svytotal(~ interaction(V2007,V2010), dadosPNADc, na.rm = T)
+
+totalsexoEraca
+
+write.table(totalsexoEraca,"E:/Users/dinilson/Documents/totalsexoEraca.csv", sep="\t")
+
+##################### Calculando o índice de Gini do Brasil ##################
+install.packages("convey")
+library (convey)
+dadosPNADc2 <- convey_prep(dadosPNADc)
+giniHab <- svygini(~VD4019, dadosPNADc2, na.rm  =  TRUE)
+giniHab
+giniHab2 <- svygini(~VD4020, dadosPNADc2, na.rm  =  TRUE)
+giniHab2
+
+###################### Calculando o índice de Gini por UF #####################
+
+giniUF <- svyby(~VD4020, by = ~UF,dadosPNADc2, svygini, na.rm  =  TRUE)
+
+write.table(giniUF,"E:/Users/dinilson/Documents/giniUF.csv", sep="\t")
+
+###################### Renda média por UF #####################################
+
+mediarendaUF <- svyby(~VD4020, by = ~UF, dadosPNADc2, svymean, na.rm = T)
+mediarendaUF
+write.table(mediarendaUF,"E:/Users/dinilson/Documents/rendamediauf.csv", sep="\t")
+
+mediarendaUF2 <- svyby(~VD4020, by = ~UF, dadosPNADc, svymean, na.rm = T)
+mediarendaUF2
+
+################# Quantis de renda ###################################
+
+quantisrenda <- svyquantile(~VD4020, dadosPNADc2, quantiles = c(.1,.25,.5,.75,.9), na.rm = T)
+quantisrenda
+
+quantisrenda2 <- svyquantile(~VD4020, dadosPNADc2, quantiles = c(.1,.25,.5,.95,.96, .97,.98,.99), na.rm = T)
+quantisrenda2
+
+quantisrenda3 <- svyquantile(~VD4020, dadosPNADc2, quantiles = c(.5,.90, .99), na.rm = T)
+quantisrenda3
+
+quantisrenda4<- svyquantile(~VD4020, dadosPNADc2, quantiles = c(.5,.90, .99), na.rm = T)
+quantisrenda4
+
+quantisrenda4b<- svyquantile(~VD4020, dadosPNADc, quantiles = c(.5,.90, .99), na.rm = T)
+quantisrenda4b
+
+
+################ Taxa de desocupação por raça ##########################
+
+txdesocupBr <- svyratio(~VD4002 == "Pessoas desocupadas",~VD4001 == "Pessoas na força de trabalho", subset(dadosPNADc, V2010=="Branca") , na.rm = T)
+txdesocupBr
+txdesocupPr <- svyratio(~VD4002 == "Pessoas desocupadas",~VD4001 == "Pessoas na força de trabalho", subset(dadosPNADc, V2010=="Preta") , na.rm = T)
+txdesocupPr
+txdesocupPa <- svyratio(~VD4002 == "Pessoas desocupadas",~VD4001 == "Pessoas na força de trabalho", subset(dadosPNADc, V2010=="Parda") , na.rm = T)
+txdesocupPa
+
+###################### Desemprego por raça e sexo ###############################
+
+txdesocupSexoRaca <- svyby(~VD4002 == "Pessoas desocupadas",~interaction(V2007,V2010),dadosPNADc, svyratio,denominator = ~VD4001 == "Pessoas na força de trabalho",na.rm = T, vartype = "cv")
+txdesocupSexoRaca
+
+write.table(txdesocupSexoRaca,"E:/Users/dinilson/Documents/txdesocupSexoRaca.csv", sep="\t")
+
+###################### Renda média por raça ###################################
+
+mediarendaraça <- svyby(~VD4020, by = ~V2010, dadosPNADc, svymean, na.rm = T)
+mediarendaraça
+
+####################### Sexo por grau de instrução (%) ##########################
+
+freqSexoInstr <- svyby(~V2007, ~VD3004, dadosPNADc, svymean, na.rm = T)
+freqSexoInstr
+write.table(freqSexoInstr,
+            "/home/dinilson/freqSexoInstr.csv", sep="\t")
+
+####################### Grau de instrução por sexo (%) ##########################
+
+freqInstrSexo <- svyby(~VD3004, ~V2007, dadosPNADc, svymean, na.rm = T)
+freqInstrSexo
+
+####################### Renda média por sexo x raça (R$) ########################
+
+mediarendasexoEraça <- svyby(~VD4020, ~ interaction(V2007,V2010), dadosPNADc, svymean, na.rm = T)
+mediarendasexoEraça

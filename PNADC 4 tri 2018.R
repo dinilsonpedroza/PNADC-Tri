@@ -1,9 +1,9 @@
 getwd()
-############# baixando toda pnadc na área de trabalho ###################
+############# baixando toda pnadc na Ã¡rea de trabalho ###################
 
 dados_pnadc <- read_pnadc("PNADC_042018.txt", "Input_PNADC_trimestral.txt")
 
-############# atribuindo rótulos as variáveis brutas ####################
+############# atribuindo rÃ³tulos as variÃ¡veis brutas ####################
 
 dados_pnadc <- pnadc_labeller(dados_pnadc, 
                               "dicionario_das_variaveis_PNAD_Continua_microdados.xls")
@@ -23,12 +23,12 @@ totalsexo
 totalsexoraca <- svytotal(~V2007 + V2010, dados_Pnadc, na.rm = T)
 totalsexoraca
 
-############### cruzando sexo e raça #####################################
+############### cruzando sexo e raÃ§a #####################################
 
 totalsexoEraca <- svytotal(~ interaction(V2007, V2010), dados_Pnadc, na.rm = T)
 totalsexoEraca
 
-############### médias e proporções ######################################
+############### mÃ©dias e proporÃ§Ãµes ######################################
 
 mediarenda <- svymean(~VD4020, dados_Pnadc, na.rm = T)
 mediarenda
@@ -39,10 +39,10 @@ propsexo
 propsexoraca <- svymean(~V2007 + V2010, dados_Pnadc, na.rm = T)
 propsexoraca
 
-################ estimando razões #########################################
-################ taxa de desocupação ######################################
+################ estimando razÃµes #########################################
+################ taxa de desocupaÃ§Ã£o ######################################
 
-txdesocup <- svyratio(~VD4002 == "Pessoas desocupadas",~VD4001 == "Pessoas na força de trabalho", 
+txdesocup <- svyratio(~VD4002 == "Pessoas desocupadas",~VD4001 == "Pessoas na forÃ§a de trabalho", 
                       dados_Pnadc, na.rm = T)
 
 txdesocup
@@ -55,7 +55,7 @@ medianarenda
 quantisrenda <- svyquantile(~VD4020, dados_Pnadc, quantiles = c(.1,.25,.5,.75,.9), na.rm = T)
 quantisrenda
 
-################## usando a função subset ###################################
+################## usando a funÃ§Ã£o subset ###################################
 
 mediarendaM <- svymean(~VD4020, subset(dados_Pnadc, V2007 == "Mulher")  , na.rm = T)
 mediarendaM
@@ -63,12 +63,8 @@ mediarendaM
 mediarendaH <- svymean(~VD4020, subset(dados_Pnadc, V2007 == "Homem")  , na.rm = T)
 mediarendaH
 
-mediarendaHpr<- svymean(~VD4017, subset(dados_Pnadc, V2007 == "Homem")  , na.rm = T)
-mediarendaHpr
-mediarendaHprhb<- svymean(~VD4016, subset(dados_Pnadc, V2007 == "Homem")  , na.rm = T)
-mediarendaHprhb
 
-txdesocup25 <- svyratio(~VD4002 == "Pessoas desocupadas",~VD4001 == "Pessoas na força de trabalho", 
+txdesocup25 <- svyratio(~VD4002 == "Pessoas desocupadas",~VD4001 == "Pessoas na forÃ§a de trabalho", 
                         subset(dados_Pnadc, V2009>=25) , na.rm = T)
 txdesocup25
 
@@ -87,7 +83,7 @@ nivelinstrMP30
 dadosPNADc_mulheres <- subset(dados_Pnadc, V2007 == "Mulher")
 mediarendamulheres<-svymean(~VD4020, dadosPNADc_mulheres, na.rm = T)
 mediarendamulheres
-################### vários domínios simultâneamente ##################################
+################### vÃ¡rios domÃ­nios simultÃ¢neamente ##################################
 
 freqSexoInstr <- svyby(~V2007, ~VD3001, dados_Pnadc, svymean, na.rm = T)
 freqSexoInstr
@@ -95,7 +91,7 @@ freqSexoInstr
 freqInstrSexo <- svyby(~VD3001, ~V2007, dados_Pnadc, svymean, na.rm = T)
 freqInstrSexo
 
-#################### renda média por UF ##############################################
+#################### renda mÃ©dia por UF ##############################################
 
 mediaRendaUF <- svyby(~VD4020, ~UF, dados_Pnadc, svymean, na.rm = T)
 mediaRendaUF
@@ -103,7 +99,7 @@ mediaRendaUF
 
 txdesocupSexoRaca <- svyby(~VD4002 == "Pessoas desocupadas", ~interaction(V2007,V2010), 
                            dados_Pnadc, svyratio, 
-                           denominator = ~VD4001 == "Pessoas na força de trabalho",
+                           denominator = ~VD4001 == "Pessoas na forÃ§a de trabalho",
                            na.rm = T, vartype = "cv")
 txdesocupSexoRaca
 
@@ -119,32 +115,32 @@ totalrendaPE <- svytotal(~VD4020, dados_Pnadc_PE, na.rm = T)
 totalrendaPE
 txdesocupSexoRacaPE <- svyby(~VD4002 == "Pessoas desocupadas", ~interaction(V2007,V2010), 
                              dados_Pnadc_PE, svyratio, 
-                           denominator = ~VD4001 == "Pessoas na força de trabalho",
+                           denominator = ~VD4001 == "Pessoas na forÃ§a de trabalho",
                            na.rm = T, vartype = "cv")
 txdesocupSexoRacaPE
 
 write.table(txdesocupSexoRacaPE, "c:/R/txdesocupSexoRacaPE.csv", sep="\t")
 
 
-dados_Pnadc_Recife <- subset(dados_Pnadc, Capital == "Município de Recife (PE)")
+dados_Pnadc_Recife <- subset(dados_Pnadc, Capital == "MunicÃ­pio de Recife (PE)")
 mediarendaRec<-svymean(~VD4020, dados_Pnadc_Recife, na.rm = T)
 mediarendaRec
 txdesocupSexoRacaRec <- svyby(~VD4002 == "Pessoas desocupadas", ~interaction(V2007,V2010), 
                               dados_Pnadc_Recife, svyratio, 
-                             denominator = ~VD4001 == "Pessoas na força de trabalho",
+                             denominator = ~VD4001 == "Pessoas na forÃ§a de trabalho",
                              na.rm = T, vartype = "cv")
 write.table(txdesocupSexoRacaRec, "c:/R/txdesocupSexoRacaRec.csv", sep="\t")
 txdesocupSexoRacaRec
 
-############ PNADs por UF da Região ########################################
+############ PNADs por UF da RegiÃ£o ########################################
 dados_Pnadc_PE <- subset(dados_Pnadc, UF == "Pernambuco")
 dados_Pnadc_BA <- subset(dados_Pnadc, UF == "Bahia")
-dados_Pnadc_CE <- subset(dados_Pnadc, UF == "Ceará")
+dados_Pnadc_CE <- subset(dados_Pnadc, UF == "CearÃ¡")
 dados_Pnadc_RN <- subset(dados_Pnadc, UF == "Rio Grande do Norte")
 dados_Pnadc_SE <- subset(dados_Pnadc, UF == "Sergipe")
-dados_Pnadc_PB <- subset(dados_Pnadc, UF == "Paraíba")
-dados_Pnadc_PI <- subset(dados_Pnadc, UF == "Piauí")
-dados_Pnadc_MA <- subset(dados_Pnadc, UF == "Maranhão")
+dados_Pnadc_PB <- subset(dados_Pnadc, UF == "ParaÃ­ba")
+dados_Pnadc_PI <- subset(dados_Pnadc, UF == "PiauÃ­")
+dados_Pnadc_MA <- subset(dados_Pnadc, UF == "MaranhÃ£o")
 dados_Pnadc_AL <- subset(dados_Pnadc, UF == "Alagoas")
 dados_Pnadc_AL
 ############ conferindo #####################################################
@@ -154,8 +150,8 @@ mediarendaPE
 mediarendaAL<-svymean(~VD4020, dados_Pnadc_AL, na.rm = T)
 mediarendaAL
 
-############ estatísticas ###################################################
-############ renda média h x m ##############################################
+############ estatÃ­sticas ###################################################
+############ renda mÃ©dia h x m ##############################################
 
 mediarendaM <- svymean(~VD4020, subset(dados_Pnadc, V2007 == "Mulher")  , na.rm = T)
 mediarendaM
@@ -216,11 +212,11 @@ mediarendaMAL
 mediarendaHAL <- svymean(~VD4020, subset(dados_Pnadc_AL, V2007 == "Homem")  , na.rm = T)
 mediarendaHAL
 
-############ taxa de desocuapação, sexo, raça, por UF ###########################################
+############ taxa de desocuapaÃ§Ã£o, sexo, raÃ§a, por UF ###########################################
 
 txdesocupSexoRaca <- svyby(~VD4002 == "Pessoas desocupadas", ~interaction(V2007,V2010), 
                            dados_Pnadc, svyratio, 
-                           denominator = ~VD4001 == "Pessoas na força de trabalho",
+                           denominator = ~VD4001 == "Pessoas na forÃ§a de trabalho",
                            na.rm = T)
 
 
@@ -228,39 +224,39 @@ write.table(txdesocupSexoRaca, "c:/R/txdesocupSexoRaca.csv", sep="\t")
 
 txdesocupSexoRacaPE <- svyby(~VD4002 == "Pessoas desocupadas", ~interaction(V2007,V2010), 
                              dados_Pnadc_PE, svyratio, 
-                             denominator = ~VD4001 == "Pessoas na força de trabalho",
+                             denominator = ~VD4001 == "Pessoas na forÃ§a de trabalho",
                              na.rm = T)
 txdesocupSexoRacaBA <- svyby(~VD4002 == "Pessoas desocupadas", ~interaction(V2007,V2010), 
                              dados_Pnadc_BA, svyratio, 
-                             denominator = ~VD4001 == "Pessoas na força de trabalho",
+                             denominator = ~VD4001 == "Pessoas na forÃ§a de trabalho",
                              na.rm = T)
 txdesocupSexoRacaCE <- svyby(~VD4002 == "Pessoas desocupadas", ~interaction(V2007,V2010), 
                              dados_Pnadc_CE, svyratio, 
-                             denominator = ~VD4001 == "Pessoas na força de trabalho",
+                             denominator = ~VD4001 == "Pessoas na forÃ§a de trabalho",
                              na.rm = T)
 txdesocupSexoRacaRN <- svyby(~VD4002 == "Pessoas desocupadas", ~interaction(V2007,V2010), 
                              dados_Pnadc_RN, svyratio, 
-                             denominator = ~VD4001 == "Pessoas na força de trabalho",
+                             denominator = ~VD4001 == "Pessoas na forÃ§a de trabalho",
                              na.rm = T)
 txdesocupSexoRacaSE <- svyby(~VD4002 == "Pessoas desocupadas", ~interaction(V2007,V2010), 
                              dados_Pnadc_SE, svyratio, 
-                             denominator = ~VD4001 == "Pessoas na força de trabalho",
+                             denominator = ~VD4001 == "Pessoas na forÃ§a de trabalho",
                              na.rm = T)
 txdesocupSexoRacaPB <- svyby(~VD4002 == "Pessoas desocupadas", ~interaction(V2007,V2010), 
                              dados_Pnadc_PB, svyratio, 
-                             denominator = ~VD4001 == "Pessoas na força de trabalho",
+                             denominator = ~VD4001 == "Pessoas na forÃ§a de trabalho",
                              na.rm = T)
 txdesocupSexoRacaPI <- svyby(~VD4002 == "Pessoas desocupadas", ~interaction(V2007,V2010), 
                              dados_Pnadc_PI, svyratio, 
-                             denominator = ~VD4001 == "Pessoas na força de trabalho",
+                             denominator = ~VD4001 == "Pessoas na forÃ§a de trabalho",
                              na.rm = T)
 txdesocupSexoRacaMA <- svyby(~VD4002 == "Pessoas desocupadas", ~interaction(V2007,V2010), 
                              dados_Pnadc_MA, svyratio, 
-                             denominator = ~VD4001 == "Pessoas na força de trabalho",
+                             denominator = ~VD4001 == "Pessoas na forÃ§a de trabalho",
                              na.rm = T)
 txdesocupSexoRacaAL <- svyby(~VD4002 == "Pessoas desocupadas", ~interaction(V2007,V2010), 
                              dados_Pnadc_AL, svyratio, 
-                             denominator = ~VD4001 == "Pessoas na força de trabalho",
+                             denominator = ~VD4001 == "Pessoas na forÃ§a de trabalho",
                              na.rm = T)
 
 write.table(txdesocupSexoRacaPE, "c:/R/txdesocupSexoRacaPE.csv", sep="\t")
@@ -273,7 +269,7 @@ write.table(txdesocupSexoRacaPI, "c:/R/txdesocupSexoRacaPI.csv", sep="\t")
 write.table(txdesocupSexoRacaMA, "c:/R/txdesocupSexoRacaMA.csv", sep="\t")
 write.table(txdesocupSexoRacaAL, "c:/R/txdesocupSexoRacaAL.csv", sep="\t")
 
-################ instrução por sexo e raça, por UF #######################
+################ instruÃ§Ã£o por sexo e raÃ§a, por UF #######################
 
 freqSexoInstr <- svyby(~VD3001, ~V2007, dados_Pnadc, svymean, na.rm = T)
 freqSexoInstrPE <- svyby(~VD3001, ~V2007, dados_Pnadc_PE, svymean, na.rm = T)

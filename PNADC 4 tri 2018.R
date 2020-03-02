@@ -212,7 +212,7 @@ mediarendaMAL
 mediarendaHAL <- svymean(~VD4020, subset(dados_Pnadc_AL, V2007 == "Homem")  , na.rm = T)
 mediarendaHAL
 
-############ taxa de desocuapação, sexo, raça, por UF ###########################################
+############ taxa de desocupação, sexo, raça, por UF ###########################################
 
 txdesocupSexoRaca <- svyby(~VD4002 == "Pessoas desocupadas", ~interaction(V2007,V2010), 
                            dados_Pnadc, svyratio, 

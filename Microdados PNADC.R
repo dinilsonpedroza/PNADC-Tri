@@ -9,13 +9,13 @@ library(PNADcIBGE)
 
 dados_pnadc <- read_pnadc("PNADC_032018.txt", "Input_PNADC_trimestral.txt")
 
-###### lendo por web scraping (já como survey) ################
+###### lendo por web scraping (jÃ¡ como survey) ################
 
 dadosPNADc <- get_pnadc(year = 2018, quarter = 3, vars=c("VD4001","VD4002"))
 install.packages("tibble")
 dadosPNADc
 
-##### lendo por web scraping (survey, variáveis) ########################
+##### lendo por web scraping (survey, variÃ¡veis) ########################
 
 variaveis_selecionadas <- c("UF", "V2007", "V2009", "V2010", "V3007", "VD3001",
                             "VD4001", "VD4002", "VD4019", "VD4020", "VD4035")
@@ -25,7 +25,7 @@ dadosPNADc <- get_pnadc(year = 2018, quarter = 3, vars = variaveis_selecionadas)
 
 library(survey)
 
-###### rendas total e média ############################################
+###### rendas total e mÃ©dia ############################################
 
 totalrenda <- svytotal(~VD4020, dadosPNADc, na.rm = T)
 totalrenda
@@ -36,7 +36,7 @@ totalrenda
 mediarenda <- svymean(~VD4019, dadosPNADc, na.rm = T)
 mediarenda
 
-###### renda média por UF ##############################################
+###### renda mÃ©dia por UF ##############################################
 
 mediaRendaUF <- svyby(~VD4019, ~UF, dadosPNADc, svymean, na.rm = T)
 mediaRendaUF
@@ -45,13 +45,13 @@ mediaRendaUF
 
 write.table(mediaRendaUF, "c:/R/mediaRendaUF.csv", sep="\t")
 
-###### taxa de desocupação #############################################
+###### taxa de desocupaÃ§Ã£o #############################################
 
 txdesocup <- svyratio(~VD4002 == "Pessoas desocupadas",
-                      ~VD4001 == "Pessoas na força de trabalho", dadosPNADc, na.rm = T)
+                      ~VD4001 == "Pessoas na forÃ§a de trabalho", dadosPNADc, na.rm = T)
 txdesocup
 
-###### dados por sexo e raça ###########################################
+###### dados por sexo e raÃ§a ###########################################
 
 totalsexo <- svytotal(~V2007, dadosPNADc, na.rm = T)
 totalsexo
@@ -77,17 +77,17 @@ giniUF <- svyby(~VD4020, by = ~UF, dadosPNADc2, svygini, na.rm  =  TRUE)
 giniUF
 write.table(giniUF, "c:/R/giniUF.csv", sep="\t")
 
-####### proporções de sexo ##############################################
+####### proporÃ§Ãµes de sexo ##############################################
 
 propsexo <- svymean(~V2007, dadosPNADc, na.rm = T)
 propsexo
 
-####### proporções de raça ##############################################
+####### proporÃ§Ãµes de raÃ§a ##############################################
 
 propraca <- svymean(~V2010, dadosPNADc, na.rm = T)
 propraca
 
-####### proporções de sexo e raça #######################################
+####### proporÃ§Ãµes de sexo e raÃ§a #######################################
 
 propsexoraca <- svymean(~V2007 + V2010, dadosPNADc, na.rm = T)
 propsexoraca
@@ -106,9 +106,9 @@ quantisrenda2 <- svyquantile(~VD4020, dadosPNADc, quantiles = c(.1,.25,.5,.75,.9
 quantisrenda
 quantisrenda2
 
-####### estimativas por domínio ##########################################
+####### estimativas por domÃ­nio ##########################################
 
-####### renda média de homens e mulheres #################################
+####### renda mÃ©dia de homens e mulheres #################################
 
 mediarendaM <- svymean(~VD4019, subset(dadosPNADc, V2007 == "Mulher")  , na.rm = T)
 mediarendaH <- svymean(~VD4019, subset(dadosPNADc, V2007 == "Homem")  , na.rm = T)
@@ -116,19 +116,19 @@ mediarendaM
 mediarendaH
 1911.7/2457.6
 
-######## taxa de desemprego por faixa etária #############################
+######## taxa de desemprego por faixa etÃ¡ria #############################
 
 txdesocup25 <- svyratio(~VD4002 == "Pessoas desocupadas",
-                        ~VD4001 == "Pessoas na força de trabalho", 
+                        ~VD4001 == "Pessoas na forÃ§a de trabalho", 
                         subset(dadosPNADc, V2009<=25) , na.rm = T)
 
 txdesocup25
 txdesocup30 <- svyratio(~VD4002 == "Pessoas desocupadas",
-                        ~VD4001 == "Pessoas na força de trabalho", 
+                        ~VD4001 == "Pessoas na forÃ§a de trabalho", 
                         subset(dadosPNADc, V2009<=30) , na.rm = T)
 txdesocup30
 
-######### múltiplas condições #############################################
+######### mÃºltiplas condiÃ§Ãµes #############################################
 
 nivelinstrHN30 <- svymean(~VD3001, subset(dadosPNADc, 
                                           V2007 == "Homem" & V2010 == "Preta" & 
@@ -141,13 +141,13 @@ nivelinstrHB30
 
 ########## PNADC separadas ################################################
 
-########## PNADC só de mulheres ###########################################
+########## PNADC sÃ³ de mulheres ###########################################
 
 dadosPNADc_mulheres <- subset(dadosPNADc, V2007 == "Mulher")
 mediarendaPNADCM <- svymean(~VD4019, dadosPNADc_mulheres, na.rm = T)
-mediarendaPNADCM <-subset(dadosPNADc, V2010 == "Preta")
+dadosPNADc_mulheresPr <-subset(dadosPNADc_mulheres, V2010 == "Preta")
 
-########## PNADC por raça #################################################
+########## PNADC por raÃ§a #################################################
 
 dadosPNADC_Pretos<-subset(dadosPNADc, V2010 == "Preta")
 dadosPNADc_Brancos <-subset(dadosPNADc, V2010 == "Branca")
@@ -164,7 +164,7 @@ mediarendaPNADCP
 mediarendaPNADCA
 2903.9/4113.4
 
-##### PNADC só de mulheres negras e PNADC só de mulheres brancas ########
+##### PNADC sÃ³ de mulheres negras e PNADC sÃ³ de mulheres brancas ########
 dadosPNADc_mulheresN <- subset(dadosPNADc, V2007 == "Mulher"& V2010=="Preta")
 dadosPNADc_mulheresB <- subset(dadosPNADc, V2007 == "Mulher"& V2010=="Branca")
 mediarendaPNADCMN <- svymean(~VD4019, dadosPNADc_mulheresN, na.rm = T)
@@ -173,7 +173,7 @@ mediarendaPNADCMN
 mediarendaPNADCMB
 1411.7/2421.5
 
-######ESTOU EM Estimação para Vários Domínios###################
+######ESTOU EM EstimaÃ§Ã£o para VÃ¡rios DomÃ­nios###################
 
 freqSexoInstr <- svyby(~V2007, ~VD3001, dadosPNADc, svymean, na.rm = T)
 freqSexoInstr
@@ -184,9 +184,9 @@ freqInstrSexo
 mediaRendaUF <- svyby(~VD4020, ~UF, dadosPNADc, svymean, na.rm = T)
 mediaRendaUF
 write.table(mediaRendaUF, "c:/R/mediaRendaUF.csv", sep="\t")
-#### resultado: esses números batem exatamente com os divulgados no SIDRA ########
+#### resultado: esses nÃºmeros batem exatamente com os divulgados no SIDRA ########
 
-#### calculando a taxa de desocupação por UF #####################################
+#### calculando a taxa de desocupaÃ§Ã£o por UF #####################################
 
 desocupUF <- svyby(~VD4002 == "Pessoas desocupadas",
                         ~UF , dadosPNADc, svytotal, na.rm = T)
@@ -195,7 +195,7 @@ desocupUF
 
 write.table(desocupUF, "c:/R/desocupaUF.csv", sep="\t")
 
-pessoasftUF <- svyby(~VD4001 == "Pessoas na força de trabalho",
+pessoasftUF <- svyby(~VD4001 == "Pessoas na forÃ§a de trabalho",
                      ~UF , dadosPNADc, svytotal, na.rm = T)
 
 pessoasftUF
@@ -203,5 +203,5 @@ pessoasftUF
 write.table(pessoasftUF, "c:/R/pessoasfotUF.csv", sep="\t")
 
 
-#### resultado: divisão de uma coluna por outra bate exatamente com o que foi publicado ##
+#### resultado: divisÃ£o de uma coluna por outra bate exatamente com o que foi publicado ##
 

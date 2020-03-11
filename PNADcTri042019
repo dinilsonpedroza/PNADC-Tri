@@ -1,9 +1,19 @@
+############################################################################
+################# Microdados da PNAD Contínua ##############################
+############################################################################
+
+##################### Carregando os pacotes ################################
+
 library("PNADcIBGE")
-variaveis_selecionadas <- c("UF", "V2007", "V2009","V2010", "V3009A", "VD3004", "VD4001","VD4002","VD4019","VD4020","VD4030")
+variaveis_selecionadas <- c("UF", "V1029", "V2007", "V2009","V2010", "V3009A", "VD3004", "VD4001","VD4002","VD4019","VD4020","VD4030")
 dadosPNADc <- get_pnadc(year = 2019, quarter = 4, vars = variaveis_selecionadas)
 library(survey)
+dadosPNADc
+library(convey)
 
+#################### Dados do Brasil #######################################
 ################ Calculando renda total e média do Brasil ####################
+
 totalrenda <- svytotal(~VD4019, dadosPNADc, na.rm = T)
 totalrenda
 
@@ -14,6 +24,17 @@ mediarenda
 
 txdesocup <- svyratio(~VD4002 == "Pessoas desocupadas",~VD4001 == "Pessoas na força de trabalho", dadosPNADc, na.rm = T)
 txdesocup
+
+################ Calculando a população total ################################
+################ Erro!!! ###################################################
+options(scipen = 999) ####### Remove a notação científica
+format(totalsexoraca, scientific=F) ###### expressar sem notação científica.
+totalpop<-svytotal(~V1029, dadosPNADc, na.rm = T)
+totalpop
+totalpop<-svytotal(~V2001, dadosPNADc, na.rm = T)
+totalpop1<-svytotal(~V2007=="Homem" + V2007=="Mulher", dadosPNADc, na.rm = T)
+totalpop1<-svytotal(~V2007=="Homem" + "Mulher", dadosPNADc, na.rm = T)
+
 
 ################ Calculando os totais por sexo ################################
 
@@ -32,10 +53,10 @@ totalsexoEraca
 
 write.table(totalsexoEraca,"E:/Users/dinilson/Documents/totalsexoEraca.csv", sep="\t")
 
-##################### Calculando o índice de Gini do Brasil ##################
-install.packages("convey")
-library (convey)
+############## criando o objeto do plano amostral complexo ##############
+
 dadosPNADc2 <- convey_prep(dadosPNADc)
+dadosPNADc2
 giniHab <- svygini(~VD4019, dadosPNADc2, na.rm  =  TRUE)
 giniHab
 giniHab2 <- svygini(~VD4020, dadosPNADc2, na.rm  =  TRUE)
@@ -51,10 +72,13 @@ write.table(giniUF,"E:/Users/dinilson/Documents/giniUF.csv", sep="\t")
 
 mediarendaUF <- svyby(~VD4020, by = ~UF, dadosPNADc2, svymean, na.rm = T)
 mediarendaUF
+mediarendaUF2 <- svyby(~VD4019, by = ~UF, dadosPNADc2, svymean, na.rm = T)
+mediarendaUF2
+
 write.table(mediarendaUF,"E:/Users/dinilson/Documents/rendamediauf.csv", sep="\t")
 
-mediarendaUF2 <- svyby(~VD4020, by = ~UF, dadosPNADc, svymean, na.rm = T)
-mediarendaUF2
+mediarendaUF3 <- svyby(~VD4020, by = ~UF, dadosPNADc, svymean, na.rm = T) 
+mediarendaUF3
 
 ################# Quantis de renda ###################################
 
@@ -92,7 +116,7 @@ write.table(txdesocupSexoRaca,"E:/Users/dinilson/Documents/txdesocupSexoRaca.csv
 
 ###################### Renda média por raça ###################################
 
-mediarendaraça <- svyby(~VD4020, by = ~V2010, dadosPNADc, svymean, na.rm = T)
+mediarendaraça <- svyby(~VD4020, ~V2010, dadosPNADc, svymean, na.rm = T)
 mediarendaraça
 
 ####################### Sexo por grau de instrução (%) ##########################
@@ -107,7 +131,128 @@ write.table(freqSexoInstr,
 freqInstrSexo <- svyby(~VD3004, ~V2007, dadosPNADc, svymean, na.rm = T)
 freqInstrSexo
 
+####################### Renda média por sexo ####################################
+
+mediarendasexo<- svyby(~VD4020, ~V2007, dadosPNADc, svymean, na.rm = T)
+mediarendasexo
+
 ####################### Renda média por sexo x raça (R$) ########################
 
 mediarendasexoEraça <- svyby(~VD4020, ~ interaction(V2007,V2010), dadosPNADc, svymean, na.rm = T)
 mediarendasexoEraça
+
+
+################## usando a função subset ###################################
+
+mediarendaM <- svymean(~VD4020, subset(dadosPNADc, V2007 == "Mulher")  , na.rm = T)
+mediarendaM
+
+mediarendaH <- svymean(~VD4020, subset(dadosPNADc, V2007 == "Homem")  , na.rm = T)
+mediarendaH
+
+################## Taxa de desocupação por faixa etária ######################
+
+txdesocuMPr25 <- svyratio(~VD4002 == "Pessoas desocupadas",~VD4001 == "Pessoas na força de trabalho", subset(dadosPNADc, V2007 == "Mulher" & V2010 == "Preta" & V2009 < 25) , na.rm = T)
+txdesocuMPr25
+
+
+####################### Taxa de desocupação em PE ####################
+
+txdesocupSexoRacaPE <- svyby(~VD4002 == "Pessoas desocupadas", ~interaction(V2007,V2010), dados_Pnadc_PE, svyratio, denominator = ~VD4001 == "Pessoas na força de trabalho", na.rm = T, vartype = "cv")
+txdesocupSexoRacaPE
+
+txdesocupSexoPE <- svyby(~VD4002 == "Pessoas desocupadas", ~V2007, dados_Pnadc_PE, svyratio, denominator = ~VD4001 == "Pessoas na força de trabalho", na.rm = T, vartype = "cv")
+txdesocupSexoPE
+
+txdesocupPE <- svyratio(~VD4002 == "Pessoas desocupadas",~VD4001 == "Pessoas na força de trabalho",  dados_Pnadc_PE, na.rm = T)
+txdesocupPE
+
+txdesocuMPr25PE <- svyratio(~VD4002 == "Pessoas desocupadas",~VD4001 == "Pessoas na força de trabalho", subset(dados_Pnadc_PE, V2007 == "Mulher" & V2010 == "Preta" & V2009 < 25) , na.rm = T)
+txdesocuMPr25PE
+
+######################## Quantis em subsets ############################
+
+quantisrendaH <- svyquantile(~VD4020, subset(dadosPNADc, V2007 == "Homem"), quantiles = c(.1,.25,.5,.75,.9, .99), na.rm = T)
+quantisrendaH
+
+quantisrendaM <- svyquantile(~VD4020, subset(dadosPNADc, V2007 == "Mulher"), quantiles = c(.1,.25,.5,.75,.9, .99), na.rm = T)
+quantisrendaM
+
+quantisrendaHBr <- svyquantile(~VD4020, subset(dadosPNADc, V2007 == "Homem" & V2010 == "Branca"), quantiles = c(.1,.25,.5,.75,.9,.95,.97,.98,.99), na.rm = T)
+quantisrendaHBr 
+
+quantisrendaMPr <- svyquantile(~VD4020, subset(dadosPNADc, V2007 == "Mulher" & V2010 == "Preta"), quantiles = c(.1,.25,.5,.75,.9, .99), na.rm = T)
+quantisrendaMPr
+
+
+###################### PNADC de Pernambuco ###################################
+
+dados_Pnadc_PE <- subset(dadosPNADc, UF == "Pernambuco")
+
+###################### Renda média PE ########################################
+
+mediarendaPE<-svymean(~VD4020, dados_Pnadc_PE, na.rm = T)
+mediarendaPE
+
+mediarendasexoPE<- svyby(~VD4020, ~V2007, dados_Pnadc_PE, svymean, na.rm = T)
+mediarendasexoPE
+
+mediarendasexoPE2<- svyby(~VD4019, ~V2007, dados_Pnadc_PE, svymean, na.rm = T)
+mediarendasexoPE2
+
+####################### Total por sexo em PE ###############################
+totalsexouPE<- svytotal(~V2007, dadosPNADc_PE, na.rm = T)
+totalsexouPE
+
+####################### População em PE for grupos etários #################
+####################### Erro!!!#############################################
+popPE <- svytotal(~V2007, dadosPNADc_PE, na.rm = T)
+popPE
+
+popPE4<- svytotal(~V2007, subset(dadosPNADc_PE, ~V2009==4), na.rm = T)
+popPE4<- svytotal(~V2007, subset(dadosPNADc_PE, V2009>=4), na.rm = T)
+PopPE4<- svyby(~V2007, ~V2009==4, dadosPNADc, svytotal, na.rm = T)
+PopPE4
+P4_5PE<-svytotal(~V2007, subset(dadosPNADc_PE, V2009>=4&V2009<5), na.rm=T)
+P4_5PE
+P4_5PE2<-svytotal(~V2007, subset(dadosPNADc_PE, V2009>=4&V2009<=5), na.rm=T)
+P4_5PE2
+###########################################################################
+########## PNADC separadas ################################################
+###########################################################################
+
+########## PNADC só de mulheres ###########################################
+
+dadosPNADc_mulheres <- subset(dadosPNADc, V2007 == "Mulher")
+
+totalM <- svytotal(~V2007, dadosPNADc_mulheres, na.rm = T) #### bate
+totalM
+
+mediarendaM <- svymean(~VD4019, dadosPNADc_mulheres, na.rm = T)
+mediarendaM
+
+mediarendaM2<- svymean(~VD4019, subset(dadosPNADc, V2007 == "Mulher"), na.rm = T)
+mediarendaM2
+
+################ PNADC só de mulheres pretas ##############################
+
+dadosPNADc_mulheresPr <-subset(dadosPNADc_mulheres, V2010 == "Preta")
+mediarendaMPr <- svymean(~VD4019, dadosPNADc_mulheresPr, na.rm = T)
+mediarendaMPr
+
+########## PNADC só de homens ###########################################
+
+dadosPNADc_homens <- subset(dadosPNADc, V2007 == "Homem")
+totalH <- svytotal(~V2007, dadosPNADc_homens, na.rm = T)
+totalH ############# bate
+
+totalpop<-totalM + totalH
+totalpop
+
+################ PNADC só de homens brancos #############################
+
+
+dadosPNADc_homensBr <-subset(dadosPNADc_homens, V2010 == "Branca")
+mediarendaHBr <- svymean(~VD4019, dadosPNADc_homensBr, na.rm = T)
+mediarendaHBr
+
